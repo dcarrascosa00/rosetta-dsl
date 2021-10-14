@@ -14,6 +14,7 @@ import com.regnosys.rosetta.rosetta.RosettaConditionalExpression
 import com.regnosys.rosetta.rosetta.RosettaContainsExpression
 import com.regnosys.rosetta.rosetta.RosettaCountOperation
 import com.regnosys.rosetta.rosetta.RosettaDisjointExpression
+import com.regnosys.rosetta.rosetta.RosettaDistinct
 import com.regnosys.rosetta.rosetta.RosettaEnumValue
 import com.regnosys.rosetta.rosetta.RosettaEnumValueReference
 import com.regnosys.rosetta.rosetta.RosettaEnumeration
@@ -26,6 +27,8 @@ import com.regnosys.rosetta.rosetta.RosettaIntLiteral
 import com.regnosys.rosetta.rosetta.RosettaMapPath
 import com.regnosys.rosetta.rosetta.RosettaMapPathValue
 import com.regnosys.rosetta.rosetta.RosettaMapRosettaPath
+import com.regnosys.rosetta.rosetta.RosettaOnlyElement
+import com.regnosys.rosetta.rosetta.RosettaOnlyExistsExpression
 import com.regnosys.rosetta.rosetta.RosettaParenthesisCalcExpression
 import com.regnosys.rosetta.rosetta.RosettaQualifiedType
 import com.regnosys.rosetta.rosetta.RosettaRecordType
@@ -39,13 +42,12 @@ import com.regnosys.rosetta.rosetta.simple.EmptyLiteral
 import com.regnosys.rosetta.rosetta.simple.Function
 import com.regnosys.rosetta.rosetta.simple.ListLiteral
 import com.regnosys.rosetta.rosetta.simple.ShortcutDeclaration
+import java.util.List
 import java.util.Map
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.conversion.impl.IDValueConverter
 import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
-import java.util.List
-import com.regnosys.rosetta.rosetta.RosettaOnlyExistsExpression
 
 class RosettaTypeProvider {
 
@@ -126,6 +128,10 @@ class RosettaTypeProvider {
 						RBuiltinType.ANY
 				}
 			}
+			RosettaDistinct:
+				safeRType(expression.argument, cycleTracker)
+			RosettaOnlyElement:
+				safeRType(expression.argument, cycleTracker)
 			RosettaRecordType:
 				new RRecordType(expression)
 			RosettaEnumValueReference: {

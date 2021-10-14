@@ -411,6 +411,13 @@ class RosettaCallableWithArgsCall extends RosettaExpression {
 	contains RosettaExpression[] args
 }
 
+class RosettaDistinct extends RosettaExpression {
+	contains RosettaExpression argument
+}
+
+class RosettaOnlyElement extends RosettaExpression {
+	contains RosettaExpression argument
+}
 
 /*****************************************
  * Translate external synonym support

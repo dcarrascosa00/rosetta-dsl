@@ -136,7 +136,8 @@ EmptyLiteral:
 ;
 
 ListLiteral:
-	'[' elements += RosettaCalcExpression (',' elements += RosettaCalcExpression )* ']';
+	'[' elements += RosettaCalcExpression (',' elements += RosettaCalcExpression )* ']'
+;
 
 // old stuff
 RosettaRootElement:
@@ -508,7 +509,15 @@ RosettaCalcAdditive returns RosettaExpression:
 ;
 
 RosettaCalcMultiplicative returns RosettaExpression:
-	RosettaCalcCountOperation ( =>({RosettaBinaryOperation.left=current} operator=('*'|'/')) right=RosettaCalcCountOperation)*
+	RosettaCalcOnlyElement ( =>({RosettaBinaryOperation.left=current} operator=('*'|'/')) right=RosettaCalcCountOperation)*
+;
+
+RosettaCalcOnlyElement returns RosettaExpression:
+	RosettaCalcDistinct (=> ({RosettaOnlyElement.argument=current} 'only-element'))?
+;
+
+RosettaCalcDistinct returns RosettaExpression:
+	RosettaCalcCountOperation (=> ({RosettaDistinct.argument=current} 'distinct'))?
 ;
 
 RosettaCalcCountOperation returns RosettaExpression:
@@ -522,10 +531,10 @@ RosettaCalcAttributeCall returns RosettaExpression:
 
 RosettaCalcPrimary returns RosettaExpression:
 	RosettaCalcConditionalExpression
-	| {RosettaCallableWithArgsCall} callable=[RosettaCallableWithArgs|QualifiedName] '(' (args+=RosettaCalcExpression (',' args+=RosettaCalcExpression)*)? ')' distinct ?= 'distinct'? toOne ?= 'only-element'?
-	| {RosettaCallableCall} callable=[AssignPathRoot|ValidID] distinct ?= 'distinct' toOne ?= 'only-element' // Hack to allow "only-element" only for attribute and alias callables
-	| {RosettaCallableCall} callable=[AssignPathRoot|ValidID] distinct ?= 'distinct' // Hack to allow "only-element" only for attribute and alias callables
-	| {RosettaCallableCall} callable=[AssignPathRoot|ValidID] toOne ?= 'only-element' // Hack to allow "only-element" only for attribute and alias callables
+	| {RosettaCallableWithArgsCall} callable=[RosettaCallableWithArgs|QualifiedName] '(' (args+=RosettaCalcExpression (',' args+=RosettaCalcExpression)*)? ')'
+//	| {RosettaCallableWithArgsCall} callable=[RosettaCallableWithArgs|QualifiedName] '(' (args+=RosettaCalcExpression (',' args+=RosettaCalcExpression)*)? ')' toOne ?= 'only-element'?
+//	| {RosettaCallableCall} callable=[AssignPathRoot|ValidID] distinct ?= 'distinct' toOne ?= 'only-element' // Hack to allow "only-element" only for attribute and alias callables
+//	| {RosettaCallableCall} callable=[AssignPathRoot|ValidID] toOne ?= 'only-element' // Hack to allow "only-element" only for attribute and alias callables
 	| RosettaCallableCall
 	| RosettaLiteral
 	| RosettaParenthesisCalcExpression

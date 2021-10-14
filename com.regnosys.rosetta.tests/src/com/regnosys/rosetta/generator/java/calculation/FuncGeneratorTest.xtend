@@ -12,6 +12,7 @@ import java.util.List
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.extensions.InjectionExtension
 import org.eclipse.xtext.testing.validation.ValidationTestHelper
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.^extension.ExtendWith
 
@@ -1457,7 +1458,6 @@ class FuncGeneratorTest {
 		val res = func.invokeFunc(List, foo)
 		assertEquals(3, res.size);
 		assertThat(res, hasItems(1, 2, 3));
-		
 	}
 	
 	@Test
@@ -1525,6 +1525,82 @@ class FuncGeneratorTest {
 		val res = func.invokeFunc(List, ImmutableList.of(1,1,1,2,2,3))
 		assertEquals(3, res.size);
 		assertThat(res, hasItems(1, 2, 3));
+	}
+	
+	@Test
+	def void funcWithListOfIntDistinct3() {
+		val model = '''
+			namespace com.rosetta.test.model
+			version "${project.version}"
+			
+			type Foo:
+				x int (0..1)
+				y int (0..1)
+			
+			func DistinctFunc:
+				inputs:
+					foo Foo (0..1)
+				output:
+					res int (0..*)
+				assign-output res: 
+					[ foo -> x, foo -> y ] distinct
+			
+		'''
+		val code = model.generateCode
+		val f = code.get("com.rosetta.test.model.functions.DistinctFunc")
+		assertEquals(
+			'''
+				package com.rosetta.test.model.functions;
+				
+				import com.google.inject.ImplementedBy;
+				import com.rosetta.model.lib.functions.RosettaFunction;
+				import com.rosetta.model.lib.mapper.MapperC;
+				import com.rosetta.model.lib.mapper.MapperS;
+				import com.rosetta.test.model.Foo;
+				import java.util.Arrays;
+				import java.util.List;
+				
+				import static com.rosetta.model.lib.expression.ExpressionOperators.*;
+				
+				@ImplementedBy(DistinctFunc.DistinctFuncDefault.class)
+				public abstract class DistinctFunc implements RosettaFunction {
+				
+					/**
+					* @param foo 
+					* @return res 
+					*/
+					public List<Integer> evaluate(Foo foo) {
+						
+						List<Integer> resHolder = doEvaluate(foo);
+						List<Integer> res = assignOutput(resHolder, foo);
+						
+						return res;
+					}
+					
+					private List<Integer> assignOutput(List<Integer> res, Foo foo) {
+						res = distinct(MapperC.of(MapperS.of(foo).<Integer>map("getX", _foo -> _foo.getX()), MapperS.of(foo).<Integer>map("getY", _foo -> _foo.getY()))).getMulti();
+						return res;
+					}
+				
+					protected abstract List<Integer> doEvaluate(Foo foo);
+					
+					public static final class DistinctFuncDefault extends DistinctFunc {
+						@Override
+						protected  List<Integer> doEvaluate(Foo foo) {
+							return Arrays.asList();
+						}
+					}
+				}
+			'''.toString,
+			f
+		)
+		val classes = code.compileToClasses
+		val func = classes.createFunc("DistinctFunc");
+		val foo = classes.createInstanceUsingBuilder('Foo', of('x', 1, 'y', 1), of())
+		val res = func.invokeFunc(List, foo)
+		assertEquals(1, res.size);
+		assertThat(res, hasItems(1));
+		
 	}
 	
 	@Test
@@ -1786,6 +1862,7 @@ class FuncGeneratorTest {
 	}
 
 	@Test
+	//@Disabled
 	def void funcWithListOfStringDistinctThenOnlyElement2() {
 		val code = '''
 			namespace com.rosetta.test.model
@@ -1806,6 +1883,7 @@ class FuncGeneratorTest {
 	}
 	
 	@Test
+	//@Disabled
 	def void funcWithListOfStringDistinctThenOnlyElement3() {
 		val code = '''
 			namespace com.rosetta.test.model
@@ -1829,6 +1907,7 @@ class FuncGeneratorTest {
 	}
 	
 	@Test
+	//@Disabled
 	def void funcWithListOfStringDistinctThenOnlyElement4() {
 		val code = '''
 			namespace com.rosetta.test.model
@@ -1874,6 +1953,7 @@ class FuncGeneratorTest {
 	}
 
 	@Test
+	@Disabled
 	def void funcOnlyElementOnlySingle() {
 		val model = '''
 			namespace "demo"

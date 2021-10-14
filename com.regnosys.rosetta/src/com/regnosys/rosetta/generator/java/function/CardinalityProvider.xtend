@@ -8,6 +8,7 @@ import com.regnosys.rosetta.rosetta.RosettaConditionalExpression
 import com.regnosys.rosetta.rosetta.RosettaContainsExpression
 import com.regnosys.rosetta.rosetta.RosettaCountOperation
 import com.regnosys.rosetta.rosetta.RosettaDisjointExpression
+import com.regnosys.rosetta.rosetta.RosettaDistinct
 import com.regnosys.rosetta.rosetta.RosettaEnumValue
 import com.regnosys.rosetta.rosetta.RosettaEnumValueReference
 import com.regnosys.rosetta.rosetta.RosettaExistsExpression
@@ -16,6 +17,7 @@ import com.regnosys.rosetta.rosetta.RosettaFeatureCall
 import com.regnosys.rosetta.rosetta.RosettaGroupByFeatureCall
 import com.regnosys.rosetta.rosetta.RosettaLiteral
 import com.regnosys.rosetta.rosetta.RosettaMapPathValue
+import com.regnosys.rosetta.rosetta.RosettaOnlyElement
 import com.regnosys.rosetta.rosetta.RosettaOnlyExistsExpression
 import com.regnosys.rosetta.rosetta.RosettaParenthesisCalcExpression
 import com.regnosys.rosetta.rosetta.RosettaRootElement
@@ -47,7 +49,8 @@ class CardinalityProvider {
 			RosettaConditionalExpression: obj.ifthen.multi || obj.elsethen.multi
 			RosettaParenthesisCalcExpression: obj.expression.isMulti
 			RosettaGroupByFeatureCall,
-			ListLiteral: true
+			ListLiteral,
+			RosettaDistinct: true
 			RosettaLiteral,
 			RosettaBinaryOperation, // check '+' operator
 			RosettaTypedFeature,
@@ -61,7 +64,8 @@ class CardinalityProvider {
 			RosettaDisjointExpression,
 			RosettaRootElement,
 			RosettaEnumValueReference,
-			RosettaMapPathValue: false
+			RosettaMapPathValue,
+			RosettaOnlyElement: false
 			default: {println("CardinalityProvider: Cardinality not defined for: " +obj?.eClass?.name)false }
 		}
 	}

@@ -9,6 +9,7 @@ import com.regnosys.rosetta.rosetta.RosettaConditionalExpression
 import com.regnosys.rosetta.rosetta.RosettaContainsExpression
 import com.regnosys.rosetta.rosetta.RosettaCountOperation
 import com.regnosys.rosetta.rosetta.RosettaDisjointExpression
+import com.regnosys.rosetta.rosetta.RosettaDistinct
 import com.regnosys.rosetta.rosetta.RosettaEnumValueReference
 import com.regnosys.rosetta.rosetta.RosettaExistsExpression
 import com.regnosys.rosetta.rosetta.RosettaExternalFunction
@@ -20,6 +21,7 @@ import com.regnosys.rosetta.rosetta.simple.Function
 import org.eclipse.emf.ecore.EObject
 
 import static com.regnosys.rosetta.generator.util.Util.*
+import com.regnosys.rosetta.rosetta.RosettaOnlyElement
 
 /**
  * A class that helps determine which RosettaFunctions a Rosetta object refers to
@@ -65,6 +67,12 @@ class RosettaFunctionDependencyProvider {
 				functionDependencies(object.disjoint) + functionDependencies(object.container)
 			}
 			RosettaCountOperation:{
+				functionDependencies(object.argument)
+			}
+			RosettaDistinct:{
+				functionDependencies(object.argument)
+			}
+			RosettaOnlyElement:{
 				functionDependencies(object.argument)
 			}
 			RosettaExternalFunction,
